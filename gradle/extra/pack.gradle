@@ -1,0 +1,181 @@
+/*
+ * The MIT License (MIT)
+ *
+ * Copyright (c) 2017 cuisongliu@qq.com
+ *
+ * Permission is hereby granted, free of charge, to any person obtaining a copy
+ * of this software and associated documentation files (the "Software"), to deal
+ * in the Software without restriction, including without limitation the rights
+ * to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+ * copies of the Software, and to permit persons to whom the Software is
+ * furnished to do so, subject to the following conditions:
+ *
+ * The above copyright notice and this permission notice shall be included in
+ * all copies or substantial portions of the Software.
+ *
+ * THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+ * IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+ * FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+ * AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+ * LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+ * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+ * THE SOFTWARE.
+ */
+
+//打包源代码
+task sourcesJar(type: Jar, dependsOn: classes) {
+    classifier = 'sources'
+    from sourceSets.main.allSource
+}
+
+javadoc {
+    options{
+        encoding "UTF-8"
+        charSet 'UTF-8'
+        author true
+        version true
+        title "javadoc"
+    }
+}
+
+task javadocJar(type: Jar, dependsOn: javadoc) {
+    classifier = 'javadoc'
+    from javadoc.destinationDir
+}
+
+artifacts {
+    archives sourcesJar
+    archives javadocJar
+}
+
+def pomConfig = {
+    scm {
+        connection "scm:git:git@github.com:cuisongliu/${rootProject.name}.git"
+        developerConnection "scm:git:git@github.com:cuisongliu/${rootProject.name}.git"
+        url "$projectLocation"
+    }
+    issueManagement {
+        system "Github Issue Tracker"
+        url "$projectLocation/issues"
+    }
+    licenses {
+        license {
+            name "The MIT License (MIT)"
+            url "https://opensource.org/licenses/mit-license.php"
+            distribution "repo"
+        }
+    }
+    developers{
+        developer{
+            name "cuisongliu"
+            email "cuisongliu@qq.com"
+        }
+    }
+}
+signing {
+    sign configurations.archives
+}
+nexusStaging {
+    packageGroup = "com.cuisongliu" //optional if packageGroup == project.getGroup()
+    stagingProfileId = "64feae5a43b07b" //when not defined will be got from server using "packageGroup"
+    username = project.hasProperty("ossUsername") ? ossUsername : System.getenv("ossUsername")
+    password = project.hasProperty("ossPassword") ? ossPassword : System.getenv("ossPassword")
+}
+uploadArchives {
+    repositories {
+        mavenDeployer {
+//            repository(url: "file:/H://DevSoftWare//MavenResources")
+            repository(url: "$uploadOssSnapshotsUrl") {
+                authentication(userName: project.hasProperty("ossUsername") ? ossUsername : System.getenv("ossUsername"),
+                        password: project.hasProperty("ossPassword") ? ossPassword : System.getenv("ossPassword"))
+            }
+            repository(url: "$uploadOssUrl") {
+                authentication(userName: project.hasProperty("ossUsername") ? ossUsername : System.getenv("ossUsername"),
+                        password: project.hasProperty("ossPassword") ? ossPassword : System.getenv("ossPassword"))
+            }
+            beforeDeployment { MavenDeployment deployment ->
+                signing.signPom(deployment)
+            }
+            pom.withXml {
+                def root = asNode()
+                root.appendNode('url', "$projectLocation")
+                root.appendNode('description', "kaptcha integration with springboot.")
+                root.appendNode('name', "$project.name")
+                if (project.name == rootProject.name){
+                    root.appendNode('packaging', "pom")
+                }else {
+                    root.appendNode('packaging', "jar")
+                }
+                root.children().last() + pomConfig
+            }
+        }
+    }
+}
+publishing {
+    publications {
+        maven(MavenPublication) {
+            from components.java
+
+            artifact sourcesJar
+            artifact javadocJar
+
+            pom.withXml {
+                def root = asNode()
+                root.dependencies.dependency.findAll { xmlDep ->
+                    // mark optional dependencies
+                    if (project.configurations.optional.allDependencies.findAll { dep ->
+                        xmlDep.groupId.text() == dep.group && xmlDep.artifactId.text() == dep.name
+                    }) {
+                        def xmlOptional = xmlDep.optional[0];
+                        if (!xmlOptional) {
+                            xmlOptional = xmlDep.appendNode('optional')
+                        }
+                        xmlOptional.value = 'true';
+                    }
+
+                    // fix maven-publish issue when all maven dependencies are placed into runtime scope
+                    if (project.configurations.compile.allDependencies.findAll { dep ->
+                        xmlDep.groupId.text() == dep.group && xmlDep.artifactId.text() == dep.name
+                    }) {
+                        def xmlScope = xmlDep.scope[0];
+                        if (!xmlScope) {
+                            xmlScope = xmlDep.appendNode('scope')
+                        }
+                        xmlScope.value = 'compile';
+                    }
+                }
+
+                root.appendNode('url', "$projectLocation")
+                root.appendNode('name', "$project.name")
+                root.appendNode('description', "kaptcha integration with springboot.")
+                if (project.name == rootProject.name){
+                    root.appendNode('packaging', "pom")
+                }else {
+                    root.appendNode('packaging', "jar")
+                }
+                root.children().last() + pomConfig
+            }
+
+            repositories{
+                maven {
+                    name 'remoteArtifactory'
+                    url "$uploadUrl"
+                    credentials{
+                        username= project.hasProperty("nexusUsername") ? nexusUsername : System.getenv("nexusUsername")
+                        password= project.hasProperty("nexusPassword") ? nexusPassword : System.getenv("nexusPassword")
+                    }
+                }
+            }
+            repositories{
+                maven {
+                    name 'remoteSnapshotArtifactory'
+                    url "$uploadSnapshotsUrl"
+                    credentials{
+                        username= project.hasProperty("nexusUsername") ? nexusUsername : System.getenv("nexusUsername")
+                        password= project.hasProperty("nexusPassword") ? nexusPassword : System.getenv("nexusPassword")
+                    }
+                }
+            }
+        }
+    }
+}

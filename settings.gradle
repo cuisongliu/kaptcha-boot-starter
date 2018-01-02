@@ -1,0 +1,3 @@
+rootProject.name = 'kaptcha-boot-starter'
+include 'kaptcha-spring-boot-autoconfigure'
+include 'kaptcha-spring-boot-starter'
