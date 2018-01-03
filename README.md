@@ -3,9 +3,9 @@
 
 #  [Kaptcha](https://github.com/penggle/kaptcha)  integration  with beetl
 
-Kaptcha-Spring-Boot-Starter 帮助你集成通用 [Kaptcha](https://github.com/javamonkey/beetl2.0) 到 Spring Boot。
+Kaptcha-Spring-Boot-Starter 帮助你集成通用 [Kaptcha](https://github.com/penggle/kaptcha) 到 Spring Boot。
 
-Kaptcha-Spring-Boot-Starter will help you use [Kaptcha](https://github.com/javamonkey/beetl2.0) with Spring Boot.
+Kaptcha-Spring-Boot-Starter will help you use [Kaptcha](https://github.com/penggle/kaptcha) with Spring Boot.
 
 ## How to use
 
@@ -61,20 +61,21 @@ Add the following dependency to your build.gradle:
     compile "com.cuisongliu:kaptcha-spring-boot-starter:1+"
     
 ## Example
-
-    kaptcha:
-        enable: true
-        properties:
-          kaptcha.border: no
-          kaptcha.border.color: 105,179,90
-          kaptcha.textproducer.font.color: blue
-          kaptcha.image.width: "125"
-          kaptcha.image.height: "45"
-          kaptcha.textproducer.font.size: "45"
-          kaptcha.session.key: KAPTCHA_SESSION_KEY
-          kaptcha.textproducer.char.length: "4"
-          kaptcha.textproducer.font.names: 宋体,楷体,微软雅黑
-        suffix: suffix
+    
+      spring:  
+        kaptcha:
+            enable: true
+            properties:
+              kaptcha.border: no
+              kaptcha.border.color: 105,179,90
+              kaptcha.textproducer.font.color: blue
+              kaptcha.image.width: "125"
+              kaptcha.image.height: "45"
+              kaptcha.textproducer.font.size: "45"
+              kaptcha.session.key: KAPTCHA_SESSION_KEY
+              kaptcha.textproducer.char.length: "4"
+              kaptcha.textproducer.font.names: 宋体,楷体,微软雅黑
+            suffix: suffix
 ## Warning
 
     KaptchaController already define. You can't new the controller that names is KaptchaController.
