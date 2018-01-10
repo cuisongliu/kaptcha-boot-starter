@@ -27,7 +27,7 @@ ext {
     junitVersion = "4.11"
     springBootVersion = "1.5.9.RELEASE"
     kaptchaVersion="2.3.2"
-    projectVersion="1.1"
+    projectVersion="1.2"
     projectLocation = "https://github.com/cuisongliu/${rootProject.name}"
     baseUrl = "http://maven.cuisongliu.com"
     nexusUrl = "$baseUrl/content/groups/public/"

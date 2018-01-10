@@ -40,11 +40,6 @@ public class KaptchaProperties {
     public static final String KAPTCHA_PREFIX="spring.kaptcha";
 
     /**
-     * 是否开启验证码
-     */
-    private Boolean enable=false;
-
-    /**
      * 根据这个参数获取kaptcha需要设置的值,验证码后缀
      */
     private String suffix ="";
@@ -59,14 +54,6 @@ public class KaptchaProperties {
 
     public void setProperties(Properties properties) {
         this.properties = properties;
-    }
-
-    public Boolean getEnable() {
-        return enable;
-    }
-
-    public void setEnable(Boolean enable) {
-        this.enable = enable;
     }
 
     public String getSuffix() {
