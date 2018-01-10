@@ -23,11 +23,11 @@ package com.cuisongliu.kaptcha.autoconfigure.controller;
  * THE SOFTWARE.
  */
 
+import com.cuisongliu.kaptcha.autoconfigure.properties.KaptchaProperties;
 import com.cuisongliu.kaptcha.autoconfigure.util.KaptchaUtil;
 import com.google.code.kaptcha.Producer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 
@@ -48,8 +48,8 @@ import java.io.IOException;
 @Controller
 @RequestMapping("/kaptcha")
 public class KaptchaController {
-    @Value("${spring.kaptcha.suffix}")
-    private String kaptchaSuffix;
+    @Autowired
+    private KaptchaProperties kaptchaProperties;
 
     @Autowired
     @Qualifier("kaptcha")
@@ -82,7 +82,7 @@ public class KaptchaController {
         String capText = producer.createText();
 
         // store the text in the session
-        String suffix = request.getParameter(kaptchaSuffix);
+        String suffix = request.getParameter(kaptchaProperties.getSuffix());
         session.setAttribute(KaptchaUtil.kaptchaKeyGenerator(suffix), capText);
         // create the image with the text
         BufferedImage bi = producer.createImage(capText);

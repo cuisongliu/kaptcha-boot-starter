@@ -27,7 +27,6 @@ import com.cuisongliu.kaptcha.autoconfigure.properties.KaptchaProperties;
 import com.google.code.kaptcha.impl.DefaultKaptcha;
 import com.google.code.kaptcha.util.Config;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnWebApplication;
 import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
@@ -43,9 +42,10 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConditionalOnWebApplication
 @EnableConfigurationProperties(KaptchaProperties.class)
-@ConditionalOnProperty(name = KaptchaProperties.KAPTCHA_PREFIX+".enable", havingValue = "true")
 @ComponentScan({"com.cuisongliu.kaptcha.autoconfigure.controller"})
 public class KaptchaAutoConfig {
+
+
     /**
      * 验证码生成相关
      */
