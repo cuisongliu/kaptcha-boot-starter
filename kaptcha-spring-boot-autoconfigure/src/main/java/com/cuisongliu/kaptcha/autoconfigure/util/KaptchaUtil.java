@@ -23,7 +23,10 @@ package com.cuisongliu.kaptcha.autoconfigure.util;
  * THE SOFTWARE.
  */
 
+import com.cuisongliu.kaptcha.autoconfigure.properties.KaptchaProperties;
 import com.google.code.kaptcha.Constants;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -37,16 +40,19 @@ import javax.servlet.http.HttpServletRequest;
  * @author cuisongliu [cuisongliu@qq.com]
  * @since 2018-01-02 22:00
  */
+@Configuration
 public class KaptchaUtil {
 
+    @Value("${"+ KaptchaProperties.KAPTCHA_PREFIX+".enable}")
+    private static Boolean enable;
+
     /**
-     * @param enable  是否开启验证码
      * @param inputName input 提交的name值
      * @param suffix 传递验证码controller的suffix参数
      * @return 是否验证通过
      */
-    public static Boolean validationKaptcha(final Boolean enable,final String inputName,final String suffix){
-        if (!enable){
+    public static Boolean validationKaptcha(final String inputName,final String suffix){
+        if (enable){
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             String kaptchaValue = request.getParameter(inputName).trim();
             String sessionValue =(String)request.getSession().getAttribute(kaptchaKeyGenerator(suffix));
@@ -57,23 +63,22 @@ public class KaptchaUtil {
     }
 
     /**
-     * @param enable  是否开启验证码
      * @param inputName input 提交的name值
      * @return 是否验证通过
      */
-    public static Boolean validationKaptcha(final Boolean enable,final String inputName){
-        return validationKaptcha(enable,inputName,"");
+    public static Boolean validationKaptcha(final String inputName){
+        return validationKaptcha(inputName,"");
     }
 
     /**
-     * @param suffix 验证码传递参数的后缀
+     * @param kaptchaParamSuffix 验证码传递参数的后缀 验证码参数后缀
      * @return 返回生成的验证码 session key
      */
-    public static String kaptchaKeyGenerator(final String suffix){
-        if (StringUtils.isEmpty(suffix)){
+    public static String kaptchaKeyGenerator(final String kaptchaParamSuffix){
+        if (StringUtils.isEmpty(kaptchaParamSuffix)){
             return Constants.KAPTCHA_SESSION_KEY;
         }else {
-            return Constants.KAPTCHA_SESSION_KEY + "_"+ Base64Utils.encodeToUrlSafeString(suffix.getBytes());
+            return Constants.KAPTCHA_SESSION_KEY + "_"+ Base64Utils.encodeToUrlSafeString(kaptchaParamSuffix.getBytes());
         }
     }
 }

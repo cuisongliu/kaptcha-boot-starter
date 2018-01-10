@@ -45,7 +45,7 @@ public class KaptchaProperties {
     private Boolean enable=false;
 
     /**
-     * 根据这个参数获取kaptcha需要设置的值
+     * 根据这个参数获取kaptcha需要设置的值,验证码后缀
      */
     private String suffix ="";
     /**
