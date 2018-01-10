@@ -23,10 +23,7 @@ package com.cuisongliu.kaptcha.autoconfigure.util;
  * THE SOFTWARE.
  */
 
-import com.cuisongliu.kaptcha.autoconfigure.properties.KaptchaProperties;
 import com.google.code.kaptcha.Constants;
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.context.annotation.Configuration;
 import org.springframework.util.Base64Utils;
 import org.springframework.util.StringUtils;
 import org.springframework.web.context.request.RequestContextHolder;
@@ -40,18 +37,14 @@ import javax.servlet.http.HttpServletRequest;
  * @author cuisongliu [cuisongliu@qq.com]
  * @since 2018-01-02 22:00
  */
-@Configuration
 public class KaptchaUtil {
-
-    @Value("${"+ KaptchaProperties.KAPTCHA_PREFIX+".enable}")
-    private static Boolean enable;
 
     /**
      * @param inputName input 提交的name值
      * @param suffix 传递验证码controller的suffix参数
      * @return 是否验证通过
      */
-    public static Boolean validationKaptcha(final String inputName,final String suffix){
+    public static Boolean validationKaptcha(final String inputName,final String suffix,final Boolean enable){
         if (enable){
             HttpServletRequest request = ((ServletRequestAttributes) RequestContextHolder.getRequestAttributes()).getRequest();
             String kaptchaValue = request.getParameter(inputName).trim();
@@ -66,8 +59,8 @@ public class KaptchaUtil {
      * @param inputName input 提交的name值
      * @return 是否验证通过
      */
-    public static Boolean validationKaptcha(final String inputName){
-        return validationKaptcha(inputName,"");
+    public static Boolean validationKaptcha(final String inputName,final Boolean enable){
+        return validationKaptcha(inputName,"",enable);
     }
 
     /**

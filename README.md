@@ -36,7 +36,7 @@ Add the following dependency to your pom.xml:
     <dependency>
        <groupId>com.cuisongliu</groupId>
        <artifactId>kaptcha-spring-boot-starter</artifactId>
-       <version>1.2</version>
+       <version>1.3</version>
      </dependency>
 
 ### gradle
